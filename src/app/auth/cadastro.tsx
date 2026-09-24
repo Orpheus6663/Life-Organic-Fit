@@ -4,7 +4,7 @@ import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, St
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { colors } from '../../constants/colors';
-import { registerUser } from '../../services/authService';
+//import { registerUser } from '../../services/authService';
 
 // Define a tela usada para criar uma nova conta.
 export default function CadastroScreen() {
@@ -30,9 +30,9 @@ export default function CadastroScreen() {
     setFormError('');
     setIsSubmitting(true);
     try {
-      await registerUser({ name, phone, email, password });
+      //await registerUser({ name, phone, email, password });
       Alert.alert('Conta criada', 'Seu cadastro foi realizado com sucesso.', [
-        { text: 'Entrar', onPress: () => router.replace('/auth/login') },
+  { text: 'Entrar', onPress: () => router.replace('/tabs/home') },
       ]);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : 'Não foi possível criar sua conta. Tente novamente.');

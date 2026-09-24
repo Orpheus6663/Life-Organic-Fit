@@ -1,16 +1,27 @@
 import type { TextInputProps } from 'react-native';
+import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors } from '../constants/colors';
 
 type InputProps = TextInputProps & { label: string };
 
-export function Input({ label, style, ...props }: InputProps) {
+export function Input({ label, style, onBlur, onFocus, ...props }: InputProps) {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <View style={styles.wrapper}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
         placeholderTextColor={colors.mutedText}
-        style={[styles.input, style]}
+        style={[styles.input, isFocused && styles.inputFocused, style]}
+        onBlur={(event) => {
+          setIsFocused(false);
+          onBlur?.(event);
+        }}
+        onFocus={(event) => {
+          setIsFocused(true);
+          onFocus?.(event);
+        }}
         {...props}
       />
     </View>
@@ -29,5 +40,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     height: 52,
     paddingHorizontal: 16,
+  },
+  inputFocused: {
+    backgroundColor: colors.white,
+    borderColor: colors.primary,
+    borderWidth: 2,
   },
 });
