@@ -61,7 +61,11 @@ export default function LoginScreen() {
           {/* Agrupa os links de recuperação de senha e criação de conta na mesma linha. */}
           <View style={styles.linksRow}>
 
-            <Pressable onPress={() => Alert.alert('Recuperar senha', 'Em breve você poderá recuperar sua senha por e-mail.')}>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => Alert.alert('Recuperar senha', 'Em breve você poderá recuperar sua senha por e-mail.')}
+              style={({ hovered, pressed }) => (hovered || pressed ? styles.linkPressed : undefined)}
+            >
               <Text style={styles.linkUnderline}>esqueci minha senha</Text>
             </Pressable>
 
@@ -69,7 +73,11 @@ export default function LoginScreen() {
             <Text style={styles.divider}>|</Text>
 
             {/* Leva novos usuários à rota de cadastro. */}
-            <Pressable onPress={() => router.push('/auth/cadastro')}>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push('/auth/cadastro')}
+              style={({ hovered, pressed }) => (hovered || pressed ? styles.linkPressed : undefined)}
+            >
               <Text style={styles.linkUnderline}>criar conta</Text>
             </Pressable>
 
@@ -163,6 +171,12 @@ const styles = StyleSheet.create({
     color: colors.primary, 
     fontSize: 13, 
     textDecorationLine: 'underline' },
+
+  // Dá retorno visual ao passar o mouse ou tocar nos links.
+  linkPressed: {
+    opacity: 0.65,
+    transform: [{ scale: 0.97 }],
+  },
 
   // Estiliza a barra que separa os dois links.
   divider: { 
