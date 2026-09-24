@@ -4,6 +4,7 @@ import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, St
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { colors } from '../../constants/colors';
+import { registerUser } from '../../services/authService';
 
 // Define a tela usada para criar uma nova conta.
 export default function CadastroScreen() {
@@ -15,17 +16,29 @@ export default function CadastroScreen() {
   const [email, setEmail] = useState('');
   // Guarda a senha informada.
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
   // É chamada quando o botão Entrar é pressionado.
-  function register() {
+  async function register() {
     // Impede o envio enquanto houver algum campo obrigatório vazio.
     if (!name.trim() || !phone.trim() || !email.trim() || !password) {
       // Mostra um aviso claro sobre o preenchimento necessário.
-      Alert.alert('Dados incompletos', 'Preencha todos os campos para criar sua conta.');
+      setFormError('Preencha todos os campos para criar sua conta.');
       return;
     }
-    // Será substituído pela chamada real ao serviço de cadastro.
-    Alert.alert('Cadastro', 'Cadastro pronto para ser conectado ao serviço.');
+    setFormError('');
+    setIsSubmitting(true);
+    try {
+      await registerUser({ name, phone, email, password });
+      Alert.alert('Conta criada', 'Seu cadastro foi realizado com sucesso.', [
+        { text: 'Entrar', onPress: () => router.replace('/auth/login') },
+      ]);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Não foi possível criar sua conta. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   // Monta a interface da tela.
@@ -56,13 +69,15 @@ export default function CadastroScreen() {
 
           {/* Agrupa os quatro campos necessários para o cadastro. */}
           <View style={styles.fields}>
-            <Input autoComplete="name" label="Nome" onChangeText={setName} placeholder="ex.: João Silva" value={name} />
-            <Input keyboardType="phone-pad" label="Telefone" onChangeText={setPhone} placeholder="(**) *********" value={phone} />
-            <Input autoCapitalize="none" autoComplete="email" keyboardType="email-address" label="E-mail" onChangeText={setEmail} placeholder="Digite seu email" value={email} />
-            <Input autoComplete="new-password" label="Senha" onChangeText={setPassword} placeholder="Digite sua senha" secureTextEntry value={password} />
+            <Input autoComplete="name" label="Nome" onChangeText={(value) => { setName(value); setFormError(''); }} placeholder="ex.: João Silva" value={name} />
+            <Input keyboardType="phone-pad" label="Telefone" onChangeText={(value) => { setPhone(value); setFormError(''); }} placeholder="(**) *********" value={phone} />
+            <Input autoCapitalize="none" autoComplete="email" keyboardType="email-address" label="E-mail" onChangeText={(value) => { setEmail(value); setFormError(''); }} placeholder="Digite seu email" value={email} />
+            <Input autoComplete="new-password" label="Senha" onChangeText={(value) => { setPassword(value); setFormError(''); }} placeholder="Digite sua senha" secureTextEntry value={password} />
           </View>
 
-          <Button onPress={register}>Entrar</Button>
+          {formError ? <Text accessibilityLiveRegion="polite" style={styles.formError}>{formError}</Text> : null}
+
+          <Button disabled={isSubmitting} onPress={register}>{isSubmitting ? 'Cadastrando...' : 'Criar conta'}</Button>
 
           {/* Leva quem já possui uma conta de volta à rota de login. */}
           <View style={styles.loginLine}>
@@ -146,6 +161,12 @@ const styles = StyleSheet.create({
   fields: {
      gap: 13 
     },
+
+  formError: {
+    color: colors.danger,
+    fontSize: 13,
+    marginTop: -8,
+  },
 
   // Mantém a mensagem e o link de login na mesma linha.
   loginLine: { 
