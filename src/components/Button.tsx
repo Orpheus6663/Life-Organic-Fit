@@ -10,7 +10,12 @@ export function Button({ children, onPress, disabled = false }: ButtonProps) {
       accessibilityRole="button"
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [styles.button, pressed && !disabled && styles.pressed, disabled && styles.disabled]}
+      style={({ hovered, pressed }) => [
+        styles.button,
+        hovered && !disabled && styles.hovered,
+        pressed && !disabled && styles.pressed,
+        disabled && styles.disabled,
+      ]}
     >
       <Text style={styles.text}>{children}</Text>
     </Pressable>
@@ -18,8 +23,31 @@ export function Button({ children, onPress, disabled = false }: ButtonProps) {
 }
 
 const styles = StyleSheet.create({
-  button: { alignItems: 'center', backgroundColor: colors.primary, borderRadius: 13, justifyContent: 'center', minHeight: 54 },
-  pressed: { backgroundColor: colors.primaryDark, transform: [{ scale: 0.99 }] },
-  disabled: { opacity: 0.6 },
-  text: { color: colors.white, fontSize: 16, fontWeight: '700' },
+  button: { 
+    alignItems: 'center', 
+    backgroundColor: colors.primary, 
+    borderRadius: 13, 
+    justifyContent: 'center', 
+    minHeight: 54 
+  },
+
+  hovered: { 
+    backgroundColor: colors.primaryDark, 
+    transform: [{ scale: 1.01 }]
+  },
+
+  pressed: { 
+    backgroundColor: colors.primaryDark, 
+    transform: [{ scale: 0.99 }] 
+  },
+
+  disabled: {
+     opacity: 0.6
+ },
+ 
+  text: { 
+  color: colors.white, 
+  fontSize: 16, 
+  fontWeight: '700'
+ },
 });
