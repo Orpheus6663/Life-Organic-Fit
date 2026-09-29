@@ -29,13 +29,32 @@ export function Header() {
 // Agrupa todos os estilos usados neste componente.
 const styles = StyleSheet.create({
   // A largura ocupa 100% da tela; a altura é definida pela soma das duas faixas internas.
-  container: { width: '100%' },
+  container: {
+    width: '100%'
+  },
   // Faixa escura: só cor de fundo e uma altura fixa pequena.
-  darkBar: { backgroundColor: '#1800B8', height: 26 },
+  darkBar: {
+    backgroundColor: '#1800B8',
+    height: 26
+  },
   // Faixa clara: centraliza o conteúdo (logo + texto) e dá espaçamento interno.
-  lightBar: { alignItems: 'center', backgroundColor: colors.lightBlue, paddingBottom: 14, paddingTop: 10 },
+  lightBar: {
+    alignItems: 'center',
+    backgroundColor: colors.lightBlue,
+    paddingBottom: 14,
+    paddingTop: 10
+  },
   // Tamanho fixo da imagem da logo dentro da faixa clara.
-  logo: { height: 50, width: 92 },
+  logo: {
+    height: 50,
+    width: 92
+  },
   // Estilo do texto "LIFE ORGANIC FIT": cor escura, negrito, letras um pouco espaçadas.
-  brand: { color: colors.text, fontSize: 14, fontWeight: '800', letterSpacing: 0.5, marginTop: 4 },
+  brand: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    marginTop: 4
+  },
 });

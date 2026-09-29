@@ -1,23 +1,16 @@
-import { Stack } from 'expo-router'; // Componente de navegação em pilha do expo-router.
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
-// Layout raiz do app: define quais telas existem
-// e esconde o cabeçalho automático do expo-router.
+// Navegação raiz: autenticação e abas ficam em grupos de rotas separados.
 export default function RootLayout() {
   return (
-    <Stack
-      initialRouteName="auth/login" // Primeira tela ao abrir o app.
-      screenOptions={{
-        headerShown: false, // Esconde o cabeçalho padrão.
-      }}
-    >
-      {/* Tela de login, fora da barra de abas. */}
-      <Stack.Screen name="auth/login" />
-
-      {/* Tela de cadastro, fora da barra de abas. */}
-      <Stack.Screen name="auth/cadastro" />
-
-      {/* Grupo que contém a navegação inferior. */}
-      <Stack.Screen name="tabs" />
-    </Stack>
+    <>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="auth" />
+        <Stack.Screen name="tabs" />
+      </Stack>
+    </>
   );
 }

@@ -4,7 +4,7 @@ import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, St
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { colors } from '../../constants/colors';
-//import { registerUser } from '../../services/authService';
+import { signUp } from '../../services/authService';
 
 // Define a tela usada para criar uma nova conta.
 export default function CadastroScreen() {
@@ -30,10 +30,14 @@ export default function CadastroScreen() {
     setFormError('');
     setIsSubmitting(true);
     try {
-      //await registerUser({ name, phone, email, password });
-      Alert.alert('Conta criada', 'Seu cadastro foi realizado com sucesso.', [
-  { text: 'Entrar', onPress: () => router.replace('/tabs/home') },
-      ]);
+      const result = await signUp({ name, phone, email, password });
+      if (result.session) {
+        router.replace('/auth/questionario');
+      } else {
+        Alert.alert('Confira seu e-mail', 'O Supabase enviou um link de confirmação. Confirme o endereço antes de entrar.', [
+          { text: 'Ir para login', onPress: () => router.replace('/auth/login') },
+        ]);
+      }
     } catch (error) {
       setFormError(error instanceof Error ? error.message : 'Não foi possível criar sua conta. Tente novamente.');
     } finally {
@@ -97,92 +101,105 @@ export default function CadastroScreen() {
 // Centraliza todos os estilos exclusivos desta tela.
 const styles = StyleSheet.create({
   // Faz a tela ocupar toda a altura, com fundo branco.
-  screen: { 
-    backgroundColor: colors.white, 
-    flex: 1 },
+  screen: {
+    backgroundColor: colors.white,
+    flex: 1
+  },
 
   // Define o cabeçalho azul fixo atrás do conteúdo.
-  hero: { 
+  hero: {
     backgroundColor: colors.white,
-    height: 400, 
-    overflow: 'hidden', 
-    position: 'absolute', 
-    width: '100%' },
+    height: 400,
+    overflow: 'hidden',
+    position: 'absolute',
+    width: '100%'
+  },
 
   // Cria a faixa azul-clara em diagonal, sem recorte branco sobre ela.
-  darkDiagonal: { 
-    backgroundColor: '#1800B8', 
-    height: 250, 
-    left: '-20%', 
-    position: 'absolute', 
-    top: -90, 
-    transform: [{ rotate: '-20deg' }], 
-    width: '180%' },
+  darkDiagonal: {
+    backgroundColor: '#1800B8',
+    height: 250,
+    left: '-20%',
+    position: 'absolute',
+    top: -90,
+    transform: [{ rotate: '-20deg' }],
+    width: '180%'
+  },
 
   // Cria a faixa azul-clara em diagonal, por cima da faixa escura.
-  blueDiagonal: { backgroundColor: '#4D93B9', 
-    height: 80, 
-    left: '-10%', 
-    position: 'absolute', 
-    top: 150, 
-    transform: [{ rotate: '-20deg' }], 
-    width: '150%'},
+  blueDiagonal: {
+    backgroundColor: '#4D93B9',
+    height: 80,
+    left: '-10%',
+    position: 'absolute',
+    top: 150,
+    transform: [{ rotate: '-20deg' }],
+    width: '150%'
+  },
 
   // Centraliza e limita o tamanho da imagem transparente da logo.
-  logo: { 
-    alignSelf: 'center', 
-    height: 102, 
-    marginTop: 80, 
-    width: 180 },
+  logo: {
+    alignSelf: 'center',
+    height: 102,
+    marginTop: 80,
+    width: 180
+  },
 
   // Posiciona o nome logo abaixo do símbolo, seguindo a referência visual.
-  brandName: { 
-    alignSelf: 'center', 
-    color: colors.text, 
-    fontFamily: 'serif', 
-    fontSize: 20, 
-    fontStyle: 'italic', 
-    marginTop: 40, 
-    transform: [{ rotate: '0deg' }], 
-    fontWeight:'bold' },
+  brandName: {
+    alignSelf: 'center',
+    color: colors.text,
+    fontFamily: 'serif',
+    fontSize: 20,
+    fontStyle: 'italic',
+    marginTop: 40,
+    transform: [{ rotate: '0deg' }],
+    fontWeight:'bold'
+  },
 
   // Garante espaço abaixo do conteúdo rolável.
-  scroll: { 
-    flexGrow: 1, 
-    paddingBottom: 32 },
+  scroll: {
+    flexGrow: 1,
+    paddingBottom: 32
+  },
   
     // Posiciona o formulário após a área visual superior.
-  form: { 
-    gap: 18, 
-    paddingHorizontal: 40, 
-    paddingTop: 283 },
+  form: {
+    gap: 18,
+    paddingHorizontal: 40,
+    paddingTop: 283
+  },
   
     // Mantém uma distância uniforme entre os campos.
   fields: {
-     gap: 13 
-    },
+    gap: 13
+  },
 
+  // Define os estilos visuais do elemento "formError".
   formError: {
     color: colors.danger,
     fontSize: 13,
-    marginTop: -8,
+    marginTop: -8
   },
 
   // Mantém a mensagem e o link de login na mesma linha.
-  loginLine: { 
-    alignItems: 'center', 
-    flexDirection: 'row', 
+  loginLine: {
+    alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: -5 },
+    marginTop: -5
+  },
 
   // Define a aparência do texto não clicável.
-  loginText: { 
-    color: colors.mutedText, 
-    fontSize: 14 },
+  loginText: {
+    color: colors.mutedText,
+    fontSize: 14
+  },
 
   // Destaca o link clicável na cor primária.
-  link: { 
-    color: colors.primary, 
-    fontSize: 14, 
-    fontWeight: '800' },
+  link: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '800'
+  },
 });

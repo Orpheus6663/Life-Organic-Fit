@@ -14,6 +14,7 @@ export function Card({ children }: CardProps) {
 
 // Agrupa o estilo do cartão em um só lugar.
 const styles = StyleSheet.create({
+  // Define os estilos visuais do elemento "card".
   card: {
     // Cor de fundo azul clarinho, igual à paleta do app.
     backgroundColor: colors.lightBlue,

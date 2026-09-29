@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { colors } from '../../constants/colors';
+import { signIn } from '../../services/authService';
+import { hasCompletedQuestionnaire } from '../../services/questionnaireService';
 
 // Define a tela usada por pessoas que já possuem uma conta.
 export default function LoginScreen() {
@@ -11,17 +13,28 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   // Guarda a senha informada.
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
   // É chamada quando o botão Entrar é pressionado.
-  function signIn() {
+  async function submitSignIn() {
     // Impede o envio enquanto houver algum campo obrigatório vazio.
     if (!email.trim() || !password) {
       // Mostra um aviso claro sobre o preenchimento necessário.
-      Alert.alert('Dados incompletos', 'Informe seu e-mail e sua senha para entrar.');
+      setFormError('Informe seu e-mail e sua senha para entrar.');
       return;
     }
-    // Será substituído pela chamada real ao serviço de autenticação.
-    Alert.alert('Login', 'Autenticação pronta para ser conectada ao serviço.');
+    setFormError('');
+    setIsSubmitting(true);
+    try {
+      await signIn(email, password);
+      const questionnaireComplete = await hasCompletedQuestionnaire();
+      router.replace(questionnaireComplete ? '/tabs/home' : '/auth/questionario');
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Não foi possível entrar. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   // Monta a interface da tela.
@@ -63,7 +76,7 @@ export default function LoginScreen() {
 
             <Pressable
               accessibilityRole="button"
-              onPress={() => Alert.alert('Recuperar senha', 'Em breve você poderá recuperar sua senha por e-mail.')}
+              onPress={() => setFormError('A recuperação de senha ainda precisa ser configurada no Supabase.')}
               style={({ hovered, pressed }) => (hovered || pressed ? styles.linkPressed : undefined)}
             >
               <Text style={styles.linkUnderline}>esqueci minha senha</Text>
@@ -83,7 +96,13 @@ export default function LoginScreen() {
 
           </View>
 
-          <Button onPress={signIn}>Entrar</Button>
+          {formError ? <Text accessibilityLiveRegion="polite" style={styles.formError}>{formError}</Text> : null}
+          <Button disabled={isSubmitting} onPress={submitSignIn}>{isSubmitting ? 'Entrando...' : 'Entrar'}</Button>
+
+          {/* Permite navegar pelas telas antes de configurar a conta e o Supabase. */}
+          <Pressable accessibilityRole="button" onPress={() => router.replace('/tabs/home')} style={styles.demoButton}>
+            <Text style={styles.demoText}>Continuar sem conta</Text>
+          </Pressable>
           
         </View>
       </ScrollView>
@@ -94,93 +113,123 @@ export default function LoginScreen() {
 // Centraliza todos os estilos exclusivos desta tela.
 const styles = StyleSheet.create({
   // Faz a tela ocupar toda a altura, com fundo branco.
-  screen: { 
-    backgroundColor: colors.white, 
-    flex: 1 },
+  screen: {
+    backgroundColor: colors.white,
+    flex: 1
+  },
 
   // Define o cabeçalho com fundo branco; as diagonais é que trazem a cor.
-  hero: { 
-    backgroundColor: colors.white, 
-    height: 400, 
-    overflow: 'hidden', 
-    position: 'absolute', 
-    width: '100%' },
+  hero: {
+    backgroundColor: colors.white,
+    height: 400,
+    overflow: 'hidden',
+    position: 'absolute',
+    width: '100%'
+  },
 
   // Cria a faixa escura em diagonal, ainda maior para garantir que cubra todo o canto.
-  darkDiagonal: { 
-    backgroundColor: '#1800B8', 
-    height: 280, left: '-20%', 
-    position: 'absolute', 
-    top: -90, 
-    transform: [{ rotate: '-20deg' }], 
-    width: '180%' },
+  darkDiagonal: {
+    backgroundColor: '#1800B8',
+    height: 280,
+    left: '-20%',
+    position: 'absolute',
+    top: -90,
+    transform: [{ rotate: '-20deg' }],
+    width: '180%'
+  },
 
   // Cria a faixa azul-clara em diagonal, por cima da faixa escura.
-  blueDiagonal: { 
-    backgroundColor: '#4D93B9', 
-    height: 80, 
-    left: '-10%', 
-    position: 'absolute', 
-    top: 150, 
-    transform: [{ rotate: '-20deg' }], 
-    width: '150%' },
+  blueDiagonal: {
+    backgroundColor: '#4D93B9',
+    height: 80,
+    left: '-10%',
+    position: 'absolute',
+    top: 150,
+    transform: [{ rotate: '-20deg' }],
+    width: '150%'
+  },
 
   // Centraliza e limita o tamanho da imagem transparente da logo.
-  logo: { 
-    alignSelf: 'center', 
-    height: 140, 
-    marginTop: 105, 
-    width: 160 },
+  logo: {
+    alignSelf: 'center',
+    height: 140,
+    marginTop: 105,
+    width: 160
+  },
 
   // Posiciona o nome logo abaixo do símbolo, com menos rotação e fonte maior.
-  brandName: { 
-    alignSelf: 'center', 
-    color: colors.text, 
-    fontFamily: 'serif', 
-    fontSize: 26, 
-    fontStyle: 'italic', 
-    marginTop: 6, 
-    transform: [{ rotate: '0deg' }], 
-    fontWeight: 'bold' },
+  brandName: {
+    alignSelf: 'center',
+    color: colors.text,
+    fontFamily: 'serif',
+    fontSize: 26,
+    fontStyle: 'italic',
+    marginTop: 6,
+    transform: [{ rotate: '0deg' }],
+    fontWeight: 'bold'
+  },
 
   // Garante espaço abaixo do conteúdo rolável.
-  scroll: { 
-    flexGrow: 1, 
-    paddingBottom: 36 },
+  scroll: {
+    flexGrow: 1,
+    paddingBottom: 36
+  },
 
   // Posiciona o formulário bem mais abaixo, afastado do cabeçalho.
-  form: { 
-    flex: 1, 
-    gap: 20, 
-    paddingHorizontal: 40, 
-    paddingTop: 380 },
+  form: {
+    flex: 1,
+    gap: 20,
+    paddingHorizontal: 40,
+    paddingTop: 380
+  },
 
   // Mantém uma distância uniforme entre os campos.
-  fields: { 
+  formError: {
+    color: colors.danger,
+    fontSize: 13,
+    textAlign: 'center'
+  },
+  // Define os estilos visuais do elemento "demoButton".
+  demoButton: {
+    alignItems: 'center',
+    paddingVertical: 10
+  },
+  // Define os estilos visuais do elemento "demoText".
+  demoText: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '700',
+    textDecorationLine: 'underline'
+  },
+  // Define os estilos visuais do elemento "fields".
+  fields: {
     gap: 16
-   },
+  },
 
   // Alinha os dois links lado a lado, centralizados.
-  linksRow: { 
-    alignItems: 'center', 
-    flexDirection: 'row', 
-    justifyContent: 'center', 
-    marginTop: -4 },
+  linksRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: -4
+  },
   // Define a aparência dos links sublinhados.
-  linkUnderline: { 
-    color: colors.primary, 
-    fontSize: 13, 
-    textDecorationLine: 'underline' },
+  linkUnderline: {
+    color: colors.primary,
+    fontSize: 13,
+    textDecorationLine: 'underline'
+  },
 
   // Dá retorno visual ao passar o mouse ou tocar nos links.
   linkPressed: {
     opacity: 0.65,
-    transform: [{ scale: 0.97 }],
+    transform: [{ scale: 0.97 }]
   },
 
   // Estiliza a barra que separa os dois links.
-  divider: { 
-    color: colors.mutedText, 
+  divider: {
+    color: colors.mutedText,
     fontSize: 13,
-    marginHorizontal: 10 },
+    marginHorizontal: 10
+  },
 });

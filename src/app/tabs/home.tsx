@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import type { ImageSourcePropType } from 'react-native';
 import { Card } from '../../components/Card';
 import { Header } from '../../components/Header';
-import { colors } from '@/constants/colors';
+import { colors } from '../../constants/colors';
 
 // Lista de imagens do carrossel exibido no topo da Home.
-const BANNERS = [
-  'https://images.unsplash.com/photo-1502904550040-7534597429ae?w=800&q=80',
-  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80',
+const BANNERS: ImageSourcePropType[] = [
+  require('@/assets/banners/pessoaFit.jpg'),
+  require('../../../assets/banners/medicoComida.jpg'),
+  require('@/assets/banners/exercicioComendo.jpg'),
+  require('@/assets/banners/comida.jpg')
 ];
 
 // Define a tela inicial, exibida depois que a pessoa faz login (e completa o questionário, se for a primeira vez).
 export default function HomeScreen() {
   // Guarda o índice (posição) da imagem do carrossel que está sendo mostrada agora. Começa em 0 (a primeira).
   const [bannerIndex, setBannerIndex] = useState(0);
-
   // Troca para a imagem anterior do carrossel; se estiver na primeira, volta para a última (efeito circular).
   function bannerAnterior() {
     setBannerIndex((atual) => (atual === 0 ? BANNERS.length - 1 : atual - 1));
@@ -46,17 +48,26 @@ export default function HomeScreen() {
         {/* Cartão do carrossel: uma imagem grande com setas para trocar de foto. */}
         <View style={styles.bannerCard}>
           {/* Mostra a imagem correspondente ao índice atual do carrossel. */}
-          <Image source={{ uri: BANNERS[bannerIndex] }} style={styles.bannerImage} />
+          <Image
+            // Carrega diretamente a imagem local escolhida pelo índice do carrossel.
+            source={BANNERS[bannerIndex]}
+            style={styles.bannerImage}
+          />
 
-          {/* Botão (seta esquerda): ao ser tocado, chama bannerAnterior(). */}
-          <Pressable onPress={bannerAnterior} style={[styles.bannerArrow, styles.bannerArrowLeft]}>
-            <Text style={styles.bannerArrowText}>‹</Text>
-          </Pressable>
+          {/* As setas só aparecem quando houver mais de uma imagem local no carrossel. */}
+          {BANNERS.length > 1 ? (
+            <>
+              {/* Chama bannerAnterior para voltar uma posição na lista de imagens. */}
+              <Pressable onPress={bannerAnterior} style={[styles.bannerArrow, styles.bannerArrowLeft]}>
+                <Text style={styles.bannerArrowText}>‹</Text>
+              </Pressable>
 
-          {/* Botão (seta direita): ao ser tocado, chama proximoBanner(). */}
-          <Pressable onPress={proximoBanner} style={[styles.bannerArrow, styles.bannerArrowRight]}>
-            <Text style={styles.bannerArrowText}>›</Text>
-          </Pressable>
+              {/* Chama proximoBanner para avançar uma posição na lista de imagens. */}
+              <Pressable onPress={proximoBanner} style={[styles.bannerArrow, styles.bannerArrowRight]}>
+                <Text style={styles.bannerArrowText}>›</Text>
+              </Pressable>
+            </>
+          ) : null}
         </View>
 
         {/* Linha com os dois cartões de resumo, lado a lado. */}
@@ -91,11 +102,21 @@ export default function HomeScreen() {
 // Agrupa todos os estilos exclusivos desta tela.
 const styles = StyleSheet.create({
   // Tela inteira, com fundo branco atrás de tudo (inclusive atrás da curva azul).
-  screen: { backgroundColor: colors.white, flex: 1 },
+  screen: {
+    backgroundColor: colors.white,
+    flex: 1
+  },
   // Espaçamento do conteúdo dentro do ScrollView: espaço entre os blocos e nas bordas.
-  content: { gap: 18, paddingBottom: 60, paddingHorizontal: 20, paddingTop: 16 },
+  content: {
+    gap: 18,
+    paddingBottom: 60,
+    paddingHorizontal: 20,
+    paddingTop: 16
+  },
   // Alinha o círculo do avatar à esquerda da tela.
-  avatarWrapper: { alignItems: 'flex-start' },
+  avatarWrapper: {
+    alignItems: 'flex-start'
+  },
   // Círculo cinza claro que serve de fundo para o ícone de perfil.
   avatar: {
     alignItems: 'center',
@@ -103,14 +124,24 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     height: 56,
     justifyContent: 'center',
-    width: 56,
+    width: 56
   },
   // Tamanho do emoji usado como ícone de perfil.
-  avatarIcon: { fontSize: 26 },
+  avatarIcon: {
+    fontSize: 26
+  },
   // Container do carrossel: cantos arredondados e "overflow: hidden" corta a imagem nas bordas.
-  bannerCard: { borderRadius: 20, height: 190, overflow: 'hidden', position: 'relative' },
+  bannerCard: {
+    borderRadius: 20,
+    height: 190,
+    overflow: 'hidden',
+    position: 'relative'
+  },
   // A imagem do carrossel ocupa 100% da largura e altura do cartão.
-  bannerImage: { height: '100%', width: '100%' },
+  bannerImage: {
+    height: '100%',
+    width: '100%'
+  },
   // Estilo base dos botões de seta: círculo escuro semitransparente, centralizado verticalmente.
   bannerArrow: {
     alignItems: 'center',
@@ -118,29 +149,60 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     height: 32,
     justifyContent: 'center',
-    marginTop: -16, // Sobe metade da altura do botão para centralizar exatamente no meio (top: 50%).
+    // Sobe metade da altura do botão para centralizá-lo no meio do banner.
+    marginTop: -16,
     position: 'absolute',
     top: '50%',
     width: 32,
   },
   // Cola a seta esquerda na borda esquerda do cartão.
-  bannerArrowLeft: { left: 10 },
+  bannerArrowLeft: {
+    left: 10
+  },
   // Cola a seta direita na borda direita do cartão.
-  bannerArrowRight: { right: 10 },
+  bannerArrowRight: {
+    right: 10
+  },
   // Estilo do símbolo "‹" ou "›" dentro dos botões de seta.
-  bannerArrowText: { color: colors.white, fontSize: 20, fontWeight: '700' },
+  bannerArrowText: {
+    color: colors.white,
+    fontSize: 20,
+    fontWeight: '700'
+  },
   // Alinha os dois cartões lado a lado, com espaço entre eles.
-  cardsRow: { flexDirection: 'row', gap: 14 },
+  cardsRow: {
+    flexDirection: 'row',
+    gap: 14,
+
+  },
   // Título pequeno dentro de cada cartão ("Meta do Dia" / "Sequência").
-  cardTitle: { color: colors.text, fontSize: 13.5, fontWeight: '700' },
+  cardTitle: {
+    color: colors.text,
+    fontSize: 13.5,
+    fontWeight: '700'
+  },
   // Alinha o emoji e o valor lado a lado, dentro do cartão de meta.
-  cardInline: { alignItems: 'center', flexDirection: 'row', gap: 6 },
+  cardInline: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6
+  },
   // Tamanho do emoji usado como ícone dentro dos cartões.
-  cardEmoji: { fontSize: 22 },
+  cardEmoji: {
+    fontSize: 22
+  },
   // Estilo do número de porcentagem no cartão de meta do dia.
-  cardValue: { color: colors.text, fontSize: 18, fontWeight: '800' },
+  cardValue: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '800'
+  },
   // Estilo do texto descritivo no cartão de sequência.
-  cardText: { color: colors.text, fontSize: 12.5, textAlign: 'center' },
+  cardText: {
+    color: colors.text,
+    fontSize: 12.5,
+    textAlign: 'center'
+  },
   // Forma azul arredondada no rodapé: um retângulo alto com os cantos superiores bem arredondados,
   // criando o efeito de "curva"/"onda" quando posicionado abaixo da borda visível da tela.
   wave: {
@@ -151,6 +213,6 @@ const styles = StyleSheet.create({
     height: 140,
     left: -40,
     position: 'absolute',
-    right: -40,
+    right: -40
   },
 });

@@ -23,31 +23,36 @@ export function Button({ children, onPress, disabled = false }: ButtonProps) {
 }
 
 const styles = StyleSheet.create({
-  button: { 
-    alignItems: 'center', 
-    backgroundColor: colors.primary, 
-    borderRadius: 13, 
-    justifyContent: 'center', 
-    minHeight: 54 
+  // Define os estilos visuais do elemento "button".
+  button: {
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: 13,
+    justifyContent: 'center',
+    minHeight: 54
   },
 
-  hovered: { 
-    backgroundColor: colors.primaryDark, 
+  // Define os estilos visuais do elemento "hovered".
+  hovered: {
+    backgroundColor: colors.primaryDark,
     transform: [{ scale: 1.01 }]
   },
 
-  pressed: { 
-    backgroundColor: colors.primaryDark, 
-    transform: [{ scale: 0.99 }] 
+  // Define os estilos visuais do elemento "pressed".
+  pressed: {
+    backgroundColor: colors.primaryDark,
+    transform: [{ scale: 0.99 }]
   },
 
+  // Define os estilos visuais do elemento "disabled".
   disabled: {
-     opacity: 0.6
- },
+    opacity: 0.6
+  },
  
-  text: { 
-  color: colors.white, 
-  fontSize: 16, 
-  fontWeight: '700'
- },
+  // Define os estilos visuais do elemento "text".
+  text: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '700'
+  },
 });
